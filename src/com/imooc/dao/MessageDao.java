@@ -37,47 +37,44 @@ public class MessageDao {
 		}
 		return messageList;
 	}
-/*
- * 根据查询条件查询数据列表
- */
-	/*public List<Message> queryMessageList(String command,String description) {
-		List<Message> list = new ArrayList<Message>();
-		Connection connection = null;
+	/*
+	 * 单挑删除
+	 */
+	public void deleteOne(int id){
+		DBAccess dbAccess = new DBAccess();
+		SqlSession sqlSession = null;
 		try {
-			Class.forName("com.mysql.jdbc.Driver");
-			connection = DriverManager.getConnection("jdbc:mysql://localhost:3306/mico_message","root","123456");
-			StringBuilder sql = new StringBuilder("select ID,COMMAND,DESCRIPTION,CONTENT from MESSAGE where 1=1");
-			List<String> pList = new ArrayList<String>();
-			if(command != null && !"".equals(command)){
-				sql.append(" and COMMAND=?");
-				pList.add(command);
-			}
-			if(description != null && !"".equals(description)){
-				sql.append(" and DESCRIPTION like '%' ? '%'");
-				pList.add(description);
-			}
-			PreparedStatement statement = connection.prepareStatement(sql.toString());
-			for(int i=0;i<pList.size();i++){
-				statement.setString(i+1, pList.get(i));
-			}
-			ResultSet rSet = statement.executeQuery();
-			
-			while(rSet.next()){
-				Message message = new Message();
-				message.setId(rSet.getString("ID"));
-				message.setCommand(rSet.getString("COMMAND"));
-				message.setDescription(rSet.getString("DESCRIPTION"));
-				message.setContent(rSet.getString("CONTENT"));
-				list.add(message);
-			}
-		} catch (ClassNotFoundException e) {
+		sqlSession = dbAccess.getSqlSession();
+		sqlSession.delete("Message.deleteOne",id);
+		sqlSession.commit();
+		//通过Sqlsession执行sql语句
+		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+		}finally {
+			if(sqlSession != null){
+				sqlSession.close();
+			}
 		}
-		return list;
-		
-	}*/
+	}
+	/*
+	 * 多条删除
+	 */
+	public void deleteBatch(List<Integer> ids){
+		DBAccess dbAccess = new DBAccess();
+		SqlSession sqlSession = null;
+		try {
+			sqlSession = dbAccess.getSqlSession();
+			sqlSession.delete("Message.deleteBatch",ids);
+			sqlSession.commit();
+			//通过Sqlsession执行sql语句
+		} catch (IOException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}finally {
+			if(sqlSession != null){
+				sqlSession.close();
+			}
+		}
+	}
 }
